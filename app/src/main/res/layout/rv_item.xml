@@ -9,7 +9,6 @@
         app:cardCornerRadius="2dp"
         android:padding="10dp"
         android:elevation="10dp"
-        app:cardBackgroundColor="#EBF1F3"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,7 +18,8 @@
 
      <androidx.constraintlayout.widget.ConstraintLayout
          android:layout_width="match_parent"
-         android:layout_height="wrap_content">
+         android:layout_height="wrap_content"
+         android:background="?android:attr/selectableItemBackground">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:layout_margin="10dp"

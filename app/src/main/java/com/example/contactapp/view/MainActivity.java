@@ -3,17 +3,21 @@ package com.example.contactapp.view;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.EditText;
@@ -24,16 +28,11 @@ import android.widget.Toast;
 import com.example.contactapp.R;
 import com.example.contactapp.model.ContactBody;
 import com.example.contactapp.viewmodel.ActivityViewModel;
-import com.example.contactapp.viewmodel.RetrofitService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MyAdapter.OnMyItemClickListener {
     private static final String TAG = "MainActivity1";
     //RetrofitService mService;
     private List<ContactBody.ContactInfo> mList = new ArrayList<>();
@@ -56,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
 //        checkInternet();
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+//        checkAndRequestPermissions();
+
 
         mRecyclerView = findViewById(R.id.recyclerView);
         progressBar = findViewById(R.id.progressBar);
@@ -121,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void intiViews(){
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        adapter = new MyAdapter(mList,MainActivity.this , mViewModel);
+        adapter = new MyAdapter(mList,MainActivity.this , mViewModel,this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setItemViewCacheSize(10);
@@ -150,42 +152,42 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        mRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+            @Override
+            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
     }
 
     private void fetchMoreData(){
         mViewModel.fetchContacts(page);
     }
 
+    @Override
+    public void onItemClick(int position) {
+      Log.d(TAG,"item Clicked");
+//        Toast.makeText(MainActivity.this, "item clicked at "+ position, Toast.LENGTH_SHORT).show();
 
+        Intent intent = new Intent(this,ContactDetailActivity.class);
+        intent.putExtra("image_path",mList.get(position).thumbnail);
+        intent.putExtra("name",mList.get(position).name);
+        intent.putExtra("number",mList.get(position).phone);
+        intent.putExtra("email",mList.get(position).email);
+        intent.putExtra("isStarred",mList.get(position).isStarred);
+        startActivity(intent);
+    }
 
-//    private void fetchContact() {
-//        mService.getContacts(1, new Callback<ContactBody>() {
-//            @Override
-//            public void onResponse(Call<ContactBody> call, Response<ContactBody> response) {
-//                Log.d(TAG, "onResponse");
-//                if (response.isSuccessful() && response.body() != null) {
-//                    Log.d(TAG, "Response is successful");
-//                    ContactBody contactBody = response.body();
-//
-//                    if (contactBody.meta.success && contactBody.meta.message.equalsIgnoreCase("Successfully Fetched Contacts")) {
-//                        Log.d(TAG, "list part");
-//                        mList = contactBody.contactInfoList;
-//                        int i;
-//                        for (i = 0; i < mList.size(); i++) {
-//                            Log.d(TAG, mList.get(i).toString());
-//                            System.out.println();
-//                        }
-//                    }
-//                } else {
-//                    Log.d(TAG + "else", response.message());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ContactBody> call, Throwable t) {
-//                Log.d(TAG, "onFailure" + t.getMessage());
-//            }
-//        });
-//    }
 
 }
