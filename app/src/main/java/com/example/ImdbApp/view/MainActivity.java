@@ -1,21 +1,15 @@
-package com.example.contactapp.view;
+package com.example.ImdbApp.view;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,11 +17,10 @@ import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
-import com.example.contactapp.R;
-import com.example.contactapp.model.ContactBody;
-import com.example.contactapp.viewmodel.ActivityViewModel;
+import com.example.ImdbApp.R;
+import com.example.ImdbApp.model.MovieBody;
+import com.example.ImdbApp.viewmodel.ActivityViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +28,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements MyAdapter.OnMyItemClickListener {
     private static final String TAG = "MainActivity1";
     //RetrofitService mService;
-    private List<ContactBody.ContactInfo> mList = new ArrayList<>();
+    private List<MovieBody.Movie> mList = new ArrayList<>();
     private Toolbar toolbar;
     private RecyclerView mRecyclerView;
     private ProgressBar progressBar;
@@ -61,16 +54,15 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.OnMyIte
 
         mRecyclerView = findViewById(R.id.recyclerView);
         progressBar = findViewById(R.id.progressBar);
-        editText = findViewById(R.id.etSearch);
-        btnSearch = findViewById(R.id.btnSearch);
+
 
         mViewModel = new ViewModelProvider(this).get(ActivityViewModel.class);
         intiViews();
-        mViewModel.fetchContacts(page);
+        mViewModel.fetchMovieList(page);
 
-        mViewModel.getData().observe(this, new Observer<List<ContactBody.ContactInfo>>() {
+        mViewModel.getData().observe(this, new Observer<List<MovieBody.Movie>>() {
             @Override
-            public void onChanged(List<ContactBody.ContactInfo> contactInfo) {
+            public void onChanged(List<MovieBody.Movie> contactInfo) {
                 Log.d(TAG , "onChanged ");
                 if(contactInfo != null) {
                     progressBar.setVisibility(View.INVISIBLE);
@@ -84,42 +76,12 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.OnMyIte
             }
         });
 
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                 filterList(s.toString());
-            }
-        });
-
-    }
-    private void filterList(String search){
-        List<ContactBody.ContactInfo> filteredList = new ArrayList<>();
-        for(ContactBody.ContactInfo info : mList){
-            if(info.name.toLowerCase().contains(search.toLowerCase())){
-                filteredList.add(info);
-            }
-        }
-
-        adapter.setFilteredList(filteredList);
-    }
-
-    private void checkInternet(){
 
     }
 
-    private void markItStar(){
 
-    }
+
 
     private void intiViews(){
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -172,20 +134,26 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.OnMyIte
     }
 
     private void fetchMoreData(){
-        mViewModel.fetchContacts(page);
+        mViewModel.fetchMovieList(page);
     }
 
     @Override
     public void onItemClick(int position) {
       Log.d(TAG,"item Clicked");
-//        Toast.makeText(MainActivity.this, "item clicked at "+ position, Toast.LENGTH_SHORT).show();
 
-        Intent intent = new Intent(this,ContactDetailActivity.class);
-        intent.putExtra("image_path",mList.get(position).thumbnail);
-        intent.putExtra("name",mList.get(position).name);
-        intent.putExtra("number",mList.get(position).phone);
-        intent.putExtra("email",mList.get(position).email);
-        intent.putExtra("isStarred",mList.get(position).isStarred);
+
+        MovieBody.Movie obj = mList.get(position);
+        Log.d(TAG,obj.toString());
+
+        Intent intent = new Intent(this, ImdbActivity.class);
+        intent.putExtra("movie_title",obj.title);
+
+        intent.putExtra("movie_imgpath",obj.poster_path);
+        intent.putExtra("movie_releasedate",obj.release_date);
+        intent.putExtra("movie_rating",obj.vote_average);
+        intent.putExtra("movie_popularity",obj.popularity);
+        intent.putExtra("movie_overview",obj.overview);
+
         startActivity(intent);
     }
 

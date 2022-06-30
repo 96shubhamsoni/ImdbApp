@@ -1,4 +1,4 @@
-package com.example.contactapp;
+package com.example.ImdbApp;
 
 import android.content.Context;
 
